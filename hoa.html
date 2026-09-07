@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Một món quà nhỏ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream: #fdf6e8;
+    --cream-2: #f6ead2;
+    --ink: #5c4632;
+    --red: #c1272d;
+    --gold: #d9b673;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+  html,body{
+    margin:0; height:100%; overflow:hidden;
+    background:#04060d;
+    font-family:'Quicksand', sans-serif;
+    overscroll-behavior:none;
+  }
+  #scene{
+    position:fixed; inset:0; width:100%; height:100%;
+    display:block; touch-action:none;
+  }
+  #hint{
+    position:fixed; left:0; right:0; bottom:16%;
+    text-align:center; color:#dce8ff;
+    font-size:14px; letter-spacing:1.5px;
+    opacity:0; pointer-events:none;
+    animation:hintFade 2.6s ease-in-out infinite;
+    text-shadow:0 0 12px rgba(140,180,255,0.5);
+  }
+  @keyframes hintFade{0%,100%{opacity:0} 50%{opacity:0.85}}
+
+  #dimOverlay{
+    position:fixed; inset:0; background:#000;
+    opacity:0; pointer-events:none;
+    transition:opacity 1.4s ease;
+    z-index:5;
+  }
+  #dimOverlay.show{ opacity:0.24; }
+
+  .hidden{ display:none !important; }
+
+  /* ---------- Letter ---------- */
+#letterWrap{
+  position:fixed;
+  inset:0;
+  z-index:20;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  padding:20px;
+  padding-bottom:1vh;
+
+  transform:scale(0.7);
+}
+  .letter-card{
+    width:min(92vw, 420px);
+    background:linear-gradient(180deg,var(--cream),var(--cream-2));
+    border-radius:16px;
+    padding:34px 30px 28px;
+    box-shadow:0 30px 80px rgba(0,0,0,0.55), 0 0 60px rgba(255,200,140,0.18);
+    transform:translateY(46px) scale(0.94);
+    opacity:0;
+    transition:transform 1.15s cubic-bezier(.19,.86,.24,1.05), opacity 1.1s ease, box-shadow 1.15s ease;
+    text-align:center;
+  }
+  .letter-card.enter{
+    transform:translateY(0) scale(1); opacity:1;
+    animation: letterGlow 3.4s ease-in-out 0.4s infinite;
+  }
+  @keyframes letterGlow{
+    0%,100%{ box-shadow:0 30px 80px rgba(0,0,0,0.55), 0 0 55px rgba(255,200,140,0.16); }
+    50%{ box-shadow:0 30px 80px rgba(0,0,0,0.55), 0 0 85px rgba(255,200,140,0.32); }
+  }
+.letter-card.rolling{
+animation: rollAway 3s linear forwards;
+}
+
+@keyframes rollAway{
+
+  /* Bắt đầu */
+  0% {
+    transform: translateY(0) scale(1) rotate(0deg);
+    opacity:1;
+    border-radius:16px;
+  }
+
+  /* Bay lên giữa */
+  35% {
+    transform: translateY(-35vh) scale(1) rotate(0deg);
+    opacity:1;
+    border-radius:16px;
+  }
+
+  /* Bắt đầu xoay */
+  50% {
+    transform: translateY(-35vh) scale(0.9) rotate(180deg);
+    opacity:1;
+    border-radius:30px;
+  }
+
+  /* Xoay tiếp */
+  65% {
+    transform: translateY(-35vh) scale(0.5) rotate(360deg);
+    opacity:0.9;
+    border-radius:45px;
+  }
+
+  /* Xoay tiếp */
+  80% {
+    transform: translateY(-35vh) scale(0.2) rotate(540deg);
+    opacity:0.6;
+    border-radius:55px;
+  }
+
+  /* Hoàn tất */
+  100% {
+    transform: translateY(-35vh) scale(0.001) rotate(720deg);
+    opacity:0;
+    border-radius:60px;
+  }
+}
+
+
+  .letter-caption{
+    color:var(--gold); letter-spacing:2px; font-size:12.5px;
+    margin:0 0 22px; text-transform:uppercase;
+  }
+  .names-row{
+    display:flex; align-items:center; justify-content:center;
+    gap:14px; margin-bottom:28px; flex-wrap:wrap;
+  }
+  .name-fixed{
+    font-family:'Dancing Script', cursive; font-weight:700;
+    font-size:30px; color:#8a2e2e; white-space:nowrap;
+  }
+  .heart-mid{
+    color:var(--red); font-size:18px;
+    animation: heartBeat 1.6s ease-in-out infinite;
+  }
+  @keyframes heartBeat{ 0%,100%{transform:scale(1);} 50%{transform:scale(1.25);} }
+  .name-input{
+    font-family:'Dancing Script', cursive; font-weight:700;
+    font-size:28px; color:#8a2e2e; text-align:center;
+    background:transparent; border:none;
+    border-bottom:2px solid #cbb98a;
+    padding:2px 6px 4px; width:160px; max-width:46vw;
+    outline:none; transition:border-color .3s ease, box-shadow .3s ease;
+  }
+  .name-input::placeholder{ color:#c3b598; font-family:'Quicksand',sans-serif; font-size:14px; }
+  .name-input:focus{ border-color:var(--red); box-shadow:0 6px 14px -8px rgba(193,39,45,0.6); }
+
+  #sendBtn{
+    display:inline-flex; align-items:center; justify-content:center; gap:6px;
+    padding:12px 34px;
+    background:var(--red); color:#fff; border:none; border-radius:28px;
+    font-family:'Quicksand',sans-serif; font-size:15px; font-weight:600;
+    cursor:pointer; box-shadow:0 10px 24px rgba(193,39,45,0.4);
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  #sendBtn:hover{ transform:scale(1.06); box-shadow:0 12px 30px rgba(193,39,45,0.55); }
+  #sendBtn:active{ transform:scale(0.94); }
+
+  /* ---------- Thanks ---------- */
+  #thanks{
+    position:fixed; inset:0; z-index:8;
+    display:flex; align-items:center; justify-content:center;
+    color:#ffe9c7; font-family:'Dancing Script', cursive;
+    font-size:min(15vw, 64px);
+    text-shadow:0 0 20px rgba(255,210,150,0.55), 0 0 55px rgba(255,190,120,0.4);
+    opacity:0; transform:scale(0.82);
+    transition:opacity 1.3s ease, transform 1.3s cubic-bezier(.19,.86,.24,1.15);
+  }
+  #thanks.show{ opacity:1; transform:scale(1); }
+  #thanks .heart{ color:#ff5d6c; margin-left:12px; }
+</style>
+</head>
+<body>
+
+<canvas id="scene"></canvas>
+<div id="hint">Chạm vào pháo hoa...</div>
+<div id="dimOverlay"></div>
+
+<div id="letterWrap" class="hidden">
+  <div class="letter-card" id="letterCard">
+    <p class="letter-caption">✦ Hợp Đồng Làm Bạn ✦</p>
+    <div class="names-row">
+      <span class="name-fixed">Chí Nghĩa</span>
+      <span class="heart-mid">+</span>
+      <input id="friendName" class="name-input" type="text" placeholder="Tên của bạn..." maxlength="24" autocomplete="off" autocapitalize="words">
+    </div>
+    <button id="sendBtn">Chấp nhận</button>
+  </div>
+</div>
+
+<div id="thanks" class="hidden">Cám ơn <span class="heart">♥</span></div>
+<audio id="bgSound" src="sound.mp3" preload="auto"></audio>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ Setup ============ */
+  const canvas = document.getElementById('scene');
+  const ctx = canvas.getContext('2d');
+  let W = 0, H = 0;
+
+  const isLowPower = (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
+                      Math.min(window.innerWidth, window.innerHeight) < 420;
+  const Q = isLowPower ? 0.55 : 1;
+
+  function rand(a,b){ return a + Math.random()*(b-a); }
+  function clamp(v,a,b){ return Math.max(a, Math.min(b,v)); }
+  function fmod(a,b){ return ((a % b) + b) % b; }
+  function lerp(a,b,t){ return a+(b-a)*t; }
+  function easeOutQuad(t){ return 1-(1-t)*(1-t); }
+  function easeInQuad(t){ return t*t; }
+  function easeOutCubic(t){ return 1-Math.pow(1-t,3); }
+  function easeOutBack(t){ const c1=1.70158, c3=c1+1; return 1 + c3*Math.pow(t-1,3) + c1*Math.pow(t-1,2); }
+  function hexToRgb(h){ const n=parseInt(h.slice(1),16); return [ (n>>16)&255, (n>>8)&255, n&255 ]; }
+  function lerpColor(c1,c2,t){
+    const a=hexToRgb(c1), b=hexToRgb(c2);
+    const r=Math.round(lerp(a[0],b[0],t)), g=Math.round(lerp(a[1],b[1],t)), bl=Math.round(lerp(a[2],b[2],t));
+    return 'rgb('+r+','+g+','+bl+')';
+  }
+
+  function hillY(xr, offsetY){
+    return H*0.82 - Math.sin(xr*Math.PI)*H*0.045 - Math.sin(xr*Math.PI*3+1)*H*0.012 + (offsetY||0);
+  }
+
+  let stars = [];
+  function regen(){
+    stars = [];
+    const count = Math.floor(150*Q);
+    for(let i=0;i<count;i++){
+      stars.push({
+        xr: Math.random(),
+        yr: Math.random(),
+        r: rand(0.5,1.9),
+        phase: rand(0,Math.PI*2),
+        tw: rand(0.3,0.9),
+        parallax: rand(0.55,1.6),
+        drift: Math.random() < 0.15 ? rand(6,18) : 0
+      });
+    }
+  }
+
+  function resize(){
+    const dpr = Math.min(window.devicePixelRatio||1, 2);
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width = W*dpr; canvas.height = H*dpr;
+    canvas.style.width = W+'px'; canvas.style.height = H+'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    regen();
+  }
+  window.addEventListener('resize', resize);
+
+  /* ============ State ============ */
+  let phase = 'idle';
+  let last = 0;
+
+  const rocket = { get xr(){ return 0.5; }, get x(){ return this.xr*W; }, get y(){ return hillY(this.xr,0)-8; } };
+
+  let igniteStart = 0, lastSparkSpawn = 0;
+  let flight = null;
+  let ascend = 0, slowScroll = 0, speedFactor = 0;
+  const FLIGHT_LIFT_DUR = 420;
+  const FLIGHT_TOTAL_DUR = 7400;
+  const FLIGHT_MAX_SPEED = 100;
+
+  let sparks = [];
+  let energyStreaks = [];
+  let petals = [], sparkles = [], fallers = [], streamers = [];
+  let burst = [];
+  let ambient = [];
+  let center = {x:0,y:0};
+  let bloomStart = 0, ringStart = 0, closeStart = 0;
+  let flowerAlpha = 1, ringAlpha = 1;
+  let sending = false, sendFadeStart = 0;
+  let lastHeartSpawn = 0;
+  let shootTimer = rand(6,13), shootingStar = null;
+
+  /* ============ Audio ============ */
+  // Chỉ dùng đúng 1 file âm thanh (sound.mp3), phát từ mốc 1:12 khi bấm vào pháo hoa.
+const soundEl = document.getElementById('bgSound');
+
+function playRocketSound(){
+  if(!soundEl) return;
+
+  try{
+    soundEl.currentTime = 73;
+    soundEl.volume = 0.7; // 🔊 chỉnh âm lượng ở đây
+    const p = soundEl.play();
+    if(p && p.catch) p.catch(()=>{});
+  }catch(e){}
+}
+
+  /* ============ Input ============ */
+  function onPointer(clientX, clientY){
+    if(phase !== 'idle') return;
+    const dx = clientX - rocket.x, dy = clientY - rocket.y;
+    if(Math.hypot(dx,dy) < 50){ ignite(); }
+  }
+  canvas.addEventListener('click', e => onPointer(e.clientX, e.clientY));
+  canvas.addEventListener('touchstart', e => {
+    if(e.touches && e.touches[0]) onPointer(e.touches[0].clientX, e.touches[0].clientY);
+  }, {passive:true});
+
+  function ignite(){
+    phase = 'ignite'; igniteStart = performance.now(); lastSparkSpawn = 0;
+    document.getElementById('hint').style.display = 'none';
+    playRocketSound();
+  }
+
+  function startFlight(now){
+    phase = 'flying';
+    flight = { start: now, from:{x:rocket.x,y:rocket.y}, to:{x:W*0.5, y:H*0.42} };
+    ascend = 0;
+  }
+
+  function currentRocketPos(now){
+    const el = now - flight.start;
+    const liftT = clamp(el/FLIGHT_LIFT_DUR, 0, 1);
+    const e = easeOutCubic(liftT);
+    const x = lerp(flight.from.x, flight.to.x, e);
+    const y = lerp(flight.from.y, flight.to.y, e);
+    if(liftT >= 1){
+      const bob = Math.sin(now*0.006)*2.2;
+      const wob = Math.sin(now*0.004)*0.05;
+      return { x, y: y+bob, rot: wob, holding:true };
+    }
+    return { x, y, rot: Math.sin(el*0.02)*0.06, holding:false };
+  }
+
+  function spawnGarden(now){
+    phase = 'bloom'; bloomStart = now;
+    petals = []; sparkles = []; fallers = []; streamers = [];
+    flowerAlpha = 1; ringAlpha = 1;
+    const unit = Math.min(W,H);
+const layers = [
+  // 🌹 Lớp 1
+  {
+    count: Math.floor(24*Q),
+    dMin: 0.075,
+    dMax: 0.11,
+    sMin: 0.080,
+    sMax: 0.090,
+    delay: 0,
+    colors: ['#c81f3f','#e2394f','#ff5d6c']
+  },
+
+  // 🌸 Lớp 2
+  {
+    count: Math.floor(28*Q),
+    dMin: 0.12,
+    dMax: 0.165,
+    sMin: 0.075,
+    sMax: 0.090,
+    delay: 200,
+    colors: ['#ff5d6c','#ff8a5b','#ff98b0']
+  },
+
+  // 🌼 Lớp 3
+  {
+    count: Math.floor(32*Q),
+    dMin: 0.175,
+    dMax: 0.235,
+    sMin: 0.075,
+    sMax: 0.080,
+    delay: 400,
+    colors: ['#ffb26b','#ffd166','#ffc6d3']
+  },
+
+  // 🌺 Lớp 4
+  {
+    count: Math.floor(46*Q)+10,
+    dMin: 0.195,
+    dMax: 0.274,
+    sMin: 0.075,
+    sMax: 0.080,
+    delay: 600,
+    colors: ['#ffd166','#ffb26b','#fff0a8','#ff98b0']
+  },
+
+  // Lớp 5
+  {
+    count: Math.floor(66*Q)+10,
+    dMin: 0.31,
+    dMax: 0.38,
+    sMin: 0.060,
+    sMax: 0.076,
+    delay: 800,
+    colors: ['#ffd166','#ffb26b','#fff0a8','#ff98b0']
+  },
+
+  // Lớp 6
+  {
+    count: Math.floor(76*Q)+10,
+    dMin: 0.40,
+    dMax: 0.50,
+    sMin: 0.060,
+    sMax: 0.066,
+    delay: 1000,
+    colors: ['#ffd166','#ffb26b','#fff0a8','#ff98b0']
+  }
+];
+
+    let idx = 0;
+    for(const layer of layers){
+      for(let i=0;i<layer.count;i++){
+        const angle = (i/layer.count)*Math.PI*2 + rand(-0.12,0.12) + idx*0.001;
+        petals.push({
+          angle,
+          dist: rand(layer.dMin,layer.dMax)*unit,
+          size: rand(layer.sMin,layer.sMax)*unit,
+          color: layer.colors[i % layer.colors.length],
+          delay: layer.delay + rand(0,160),
+          willFall: Math.random() < 0.2,
+          fallAt: rand(1200,2600),
+          fallen:false
+        });
+        idx++;
+      }
+    }
+    const sc = Math.floor(90*Q);
+    for(let i=0;i<sc;i++){
+      sparkles.push({ angle: rand(0,Math.PI*2), dist: rand(0.03,0.27)*unit, size: rand(1,2.8), phase: rand(0,Math.PI*2), speed: rand(1,2.6) });
+    }
+    const stc = Math.floor(12*Q);
+    for(let i=0;i<stc;i++){
+      const angle = rand(0,Math.PI*2);
+      streamers.push({
+        angle, speed: rand(2.2,3.6), gravity: rand(0.01,0.02),
+        x:center.x, y:center.y, vx:Math.cos(angle)*rand(2.2,3.6), vy:Math.sin(angle)*rand(2.2,3.6),
+        trail:[], life:0, maxLife: rand(1100,1600),
+        color: ['#ffd166','#ff8a5b','#ff5d6c'][i%3]
+      });
+    }
+  }
+
+  function petalPos(p, now){
+    let eased;
+    if(phase === 'bloom'){
+      const t = clamp((now-bloomStart-p.delay)/750, 0, 1);
+      eased = easeOutBack(t);
+    } else {
+      eased = 1;
+    }
+    const breathe = (phase!=='bloom') ? 1+0.015*Math.sin(now*0.0018+p.angle) : 1;
+    const groupRot = (phase==='bloom') ? 0 : (now-ringStart>0 ? (now-ringStart)*0.00003 : 0);
+    const angle = p.angle + groupRot+30;
+    const dist = p.dist*eased*breathe;
+    return { x: center.x+Math.cos(angle)*dist, y: center.y+Math.sin(angle)*dist, angle, eased };
+  }
+
+  function startRing(now){
+    phase = 'ring'; ringStart = now;
+  }
+
+function startLetter(now){
+  phase = 'letter';
+
+  setTimeout(() => {
+    document.getElementById('dimOverlay').classList.add('show');
+    document.getElementById('letterWrap').classList.remove('hidden');
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        document.getElementById('letterCard').classList.add('enter');
+      });
+    });
+  }, 2200);
+}
+
+  function spawnBigBurst(now){
+    phase = 'closing'; closeStart = now;
+    burst = [];
+    const cnt = Math.floor(290*Q);
+    for(let i=0;i<cnt;i++){
+      const ang = rand(0,Math.PI*6), sp = rand(1.2,8.5);
+      burst.push({
+        x:center.x, y:center.y+20,
+        vx:Math.cos(ang)*sp, vy:Math.sin(ang)*sp,
+        life:0, maxLife: rand(700,1500),
+        size: rand(3.4,5.4),
+        star: Math.random()<0.9,
+        color: ['#fff6df','#ffd166','#ff9db1','#bfe3ff'][i%4]
+      });
+    }
+  }
+
+  function showThanks(now){
+    phase = 'thanks';
+    const el = document.getElementById('thanks');
+    el.classList.remove('hidden');
+    requestAnimationFrame(()=> requestAnimationFrame(()=> el.classList.add('show')));
+  }
+
+  document.getElementById('sendBtn').addEventListener('click', ()=>{
+    if(phase !== 'letter' || sending) return;
+    sending = true; sendFadeStart = performance.now();
+    document.getElementById('dimOverlay').classList.remove('show');
+    const card = document.getElementById('letterCard');
+    card.classList.remove('enter');
+    card.classList.add('rolling');
+    card.addEventListener('animationend', function onEnd(){
+      card.removeEventListener('animationend', onEnd);
+      document.getElementById('letterWrap').classList.add('hidden');
+      spawnBigBurst(performance.now());
+    }, { once:true });
+  });
+
+  /* ============ Update helpers ============ */
+  function updateSparks(dt){
+    for(let i=sparks.length-1;i>=0;i--){
+      const s = sparks[i];
+      s.age += dt-10; s.vy += 0.018*dt; s.x += s.vx*dt/16; s.y += s.vy*dt/16;
+      if(s.age > s.maxLife) sparks.splice(i,1);
+    }
+  }
+  function spawnIgniteSpark(){
+    for(let i=0;i<2;i++){
+      sparks.push({ x:rocket.x+rand(-3,3), y:rocket.y-14, vx:rand(-0.6,0.6), vy:rand(-1.6,-0.4), age:0, maxLife:rand(280,420), color:'#ffb347', size:rand(1.2,2.4) });
+    }
+  }
+  function spawnThrustSpark(pos){
+    sparks.push({ x:pos.x+rand(-6,6), y:pos.y+10, vx:rand(-0.4,0.4), vy:rand(2.5,5)*(0.4+speedFactor), age:0, maxLife:rand(220,380), color:'#ffb27a', size:rand(1,2.2) });
+  }
+  function updateEnergyStreaks(dt, now){
+    if(phase==='flying' && speedFactor>0.25 && Math.random()<0.5){
+      energyStreaks.push({ x: rand(0,W), y:-30, len: rand(30,90)*speedFactor, speed:(5+speedFactor*30), alpha: rand(0.35,0.85) });
+    }
+    for(let i=energyStreaks.length-1;i>=0;i--){
+      const e = energyStreaks[i];
+      e.y += e.speed*dt/16;
+      if(e.y - e.len > H+20) energyStreaks.splice(i,1);
+    }
+  }
+  function updateFallers(dt){
+    for(let i=fallers.length-1;i>=0;i--){
+      const f = fallers[i];
+      f.vy += 0.014*dt; f.x += f.vx*dt/16; f.y += f.vy*dt/16; f.alpha -= dt*0.0007;
+      if(f.alpha<=0 || f.y>H+30) fallers.splice(i,1);
+    }
+  }
+  function updatePetalFalls(now){
+    for(const p of petals){
+      if(p.willFall && !p.fallen && (now-bloomStart) > (900+p.fallAt)){
+        p.fallen = true;
+        const pos = petalPos(p, now);
+        fallers.push({ x:pos.x, y:pos.y, vx:rand(-0.3,0.3), vy:rand(0,0.3), size:p.size*0.55, color:p.color, alpha:1 });
+      }
+    }
+  }
+  function updateStreamers(dt, now){
+    for(let i=streamers.length-1;i>=0;i--){
+      const s = streamers[i];
+      s.life += dt;
+      s.vy += s.gravity*dt;
+      s.x += s.vx*dt/16; s.y += s.vy*dt/16;
+      s.trail.push({x:s.x,y:s.y});
+      if(s.trail.length>10) s.trail.shift();
+      if(s.life > s.maxLife) streamers.splice(i,1);
+    }
+  }
+  function updateBurst(dt){
+    for(let i=burst.length-1;i>=0;i--){
+      const b = burst[i];
+      b.life += dt; b.vx *= 0.985; b.vy = b.vy*0.985 + 0.008*dt; b.x += b.vx*dt/16; b.y += b.vy*dt/16;
+      if(b.life > b.maxLife) burst.splice(i,1);
+    }
+  }
+  function updateAmbient(now, dt){
+    if(now-lastHeartSpawn > 480){
+      lastHeartSpawn = now;
+      ambient.push({
+        x: rand(W*0.28,W*0.72), y: H*0.66, vy: rand(0.1,0.24),
+        drift: rand(-0.04,0.04), size: rand(11,17), alpha: 1,
+        glyph: Math.random()<0.55 ? '♥' : '✦', hue: Math.random()<0.55 ? '#ff7d8a' : '#ffe1a8'
+      });
+    }
+    for(let i=ambient.length-1;i>=0;i--){
+      const a = ambient[i];
+      a.y -= a.vy*dt/16; a.x += a.drift*dt/16; a.alpha -= dt*0.00042;
+      if(a.alpha<=0) ambient.splice(i,1);
+    }
+  }
+  function updateShooting(now, dt){
+    if(!shootingStar){
+      shootTimer -= dt/1000;
+      if(shootTimer<=0 && (phase==='idle'||phase==='ignite')){
+        shootingStar = { x: rand(W*0.1,W*0.6), y: rand(H*0.05,H*0.22), vx: rand(7,10), vy: rand(3.4,5), age:0 };
+        shootTimer = rand(9,18);
+      }
+    } else {
+      shootingStar.age += dt;
+      shootingStar.x += shootingStar.vx*dt/16;
+      shootingStar.y += shootingStar.vy*dt/16;
+      if(shootingStar.age > 700 || shootingStar.x>W+50) shootingStar = null;
+    }
+  }
+
+  /* ============ Main update ============ */
+  function update(now, dt){
+    updateShooting(now, dt);
+    slowScroll += dt*0.012;
+
+    if(phase==='ignite'){
+      if(now-lastSparkSpawn>45){ spawnIgniteSpark(); lastSparkSpawn=now; }
+      updateSparks(dt);
+      if(now-igniteStart>680) startFlight(now);
+
+    } else if(phase==='flying'){
+      const el = now - flight.start;
+      const tRatio = clamp(el/FLIGHT_TOTAL_DUR, 0, 1);
+      const speedNow = easeInQuad(tRatio) * FLIGHT_MAX_SPEED;
+      speedFactor = speedNow / FLIGHT_MAX_SPEED;
+      ascend += speedNow*dt/16;
+
+      const pos = currentRocketPos(now);
+      flight.pos = pos;
+      if(pos.holding && Math.random()<0.6) spawnThrustSpark(pos);
+      updateSparks(dt);
+      updateEnergyStreaks(dt, now);
+
+      if(el >= FLIGHT_TOTAL_DUR){
+        center = { x: flight.to.x, y: flight.to.y };
+        spawnGarden(now);
+      }
+
+    } else if(phase==='bloom'){
+      updatePetalFalls(now); updateFallers(dt); updateStreamers(dt, now);
+      if(now-bloomStart > 960+650) startRing(now);
+
+    } else if(phase==='ring'){
+      updatePetalFalls(now); updateFallers(dt); updateStreamers(dt, now);
+      if(now-ringStart > 700) startLetter(now);
+
+    } else if(phase==='letter'){
+      updatePetalFalls(now); updateFallers(dt); updateStreamers(dt, now);
+      if(sending){
+        const el = now - sendFadeStart;
+        flowerAlpha = clamp(1-el/500, 0, 1);
+        ringAlpha = clamp(1-el/420, 0, 1);
+      }
+} else if(phase==='closing'){
+  updateBurst(dt);
+
+  if(now-closeStart > 150) showThanks(now);
+
+} else if(phase==='thanks'){
+  updateBurst(dt);
+  updateAmbient(now, dt);
+}
+  }
+
+  /* ============ Draw ============ */
+  function drawSky(){
+    const dark = clamp(ascend/2200,0,1);
+    const c0 = lerpColor('#05070f','#000103',dark);
+    const c1 = lerpColor('#0a1530','#04070f',dark);
+    const c2 = lerpColor('#0e2140','#060b18',dark);
+    const g = ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,c0); g.addColorStop(0.55,c1); g.addColorStop(1,c2);
+    ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+  }
+  function drawStars(now){
+    const totalScroll = ascend + slowScroll;
+    const flying = phase==='flying';
+    for(const s of stars){
+      const range = H+160;
+      const y = fmod(s.yr*range + totalScroll*s.parallax, range) - 80;
+      const x = s.xr*W + (s.drift ? Math.sin(now*0.00018+s.phase)*s.drift : 0);
+      const tw = 0.35 + 0.65*Math.abs(Math.sin(now*0.0011*s.tw+s.phase));
+      if(flying && speedFactor>0.08){
+        const len = speedFactor*32*s.parallax;
+        const grad = ctx.createLinearGradient(x,y-len,x,y);
+        grad.addColorStop(0,'rgba(210,225,255,0)');
+        grad.addColorStop(1,'rgba(235,242,255,'+tw+')');
+        ctx.strokeStyle = grad; ctx.lineWidth = Math.max(0.6,s.r*0.9);
+        ctx.beginPath(); ctx.moveTo(x,y-len); ctx.lineTo(x,y); ctx.stroke();
+      } else {
+        ctx.globalAlpha = tw;
+        ctx.fillStyle = '#eaf2ff';
+        ctx.beginPath(); ctx.arc(x,y,s.r,0,Math.PI*2); ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+    }
+    if(shootingStar){
+      const ss = shootingStar;
+      const a = 1-ss.age/700;
+      const grad = ctx.createLinearGradient(ss.x,ss.y, ss.x-ss.vx*10, ss.y-ss.vy*10);
+      grad.addColorStop(0, 'rgba(255,255,255,'+a+')');
+      grad.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.strokeStyle = grad; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(ss.x,ss.y); ctx.lineTo(ss.x-ss.vx*10, ss.y-ss.vy*10); ctx.stroke();
+    }
+    if(flying){
+      ctx.save(); ctx.globalCompositeOperation='lighter';
+      for(const e of energyStreaks){
+        const grad = ctx.createLinearGradient(e.x,e.y-e.len,e.x,e.y);
+        grad.addColorStop(0,'rgba(190,220,255,0)');
+        grad.addColorStop(1,'rgba(220,235,255,'+e.alpha+')');
+        ctx.strokeStyle = grad; ctx.lineWidth = 1.4;
+        ctx.beginPath(); ctx.moveTo(e.x,e.y-e.len); ctx.lineTo(e.x,e.y); ctx.stroke();
+      }
+      ctx.restore();
+    }
+  }
+ function drawHill(){
+    if(ascend > H+60) return;
+
+    const bottom = H + ascend + 200;
+    const left = -100;
+    const right = W + 100;
+
+    ctx.beginPath();
+
+    // Bắt đầu vượt ra ngoài bên trái
+    ctx.moveTo(left, H + ascend);
+
+    // Vẽ đường đồi từ trái sang phải
+    for(let x=0; x<=W; x+=Math.max(12,W/60)){
+        ctx.lineTo(x, hillY(x/W, ascend));
+    }
+
+    // Vượt ra ngoài bên phải
+    ctx.lineTo(right, H + ascend);
+
+    // Kéo xuống vượt đáy
+    ctx.lineTo(right, bottom);
+    ctx.lineTo(left, bottom);
+
+    // Khép về bên trái
+    ctx.closePath();
+
+    const g = ctx.createLinearGradient(
+        0, H*0.68 + ascend,
+        0, bottom
+    );
+
+    g.addColorStop(0,'#173a22');
+    g.addColorStop(1,'#0a1c10');
+
+    ctx.fillStyle = g;
+    ctx.fill();
+
+    ctx.fillStyle = 'rgba(255,255,255,0.05)';
+
+    for(let i=0;i<7;i++){
+        const xr = (i+0.5)/7;
+
+        ctx.beginPath();
+        ctx.arc(
+            xr*W,
+            hillY(xr,ascend)+rand(6,14),
+            1.4,
+            0,
+            Math.PI*2
+        );
+        ctx.fill();
+    }
+}
+  function drawRocketIdle(now){
+    const x = rocket.x, y = rocket.y;
+    drawRocketAt(x,y,now,0);
+  }
+  function drawRocketAt(x,y,now,rot){
+    const glowR = 20+5*Math.sin(now*0.004);
+    const glow = ctx.createRadialGradient(x,y,0,x,y,glowR);
+    glow.addColorStop(0,'rgba(255,90,70,0.55)'); glow.addColorStop(1,'rgba(255,90,70,0)');
+    ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(x,y,glowR,0,Math.PI*2); ctx.fill();
+
+    let jitterX=0, jitterY=0;
+    if(phase==='ignite'){ jitterX = Math.sin(now*0.09)*2.2; jitterY = Math.cos(now*0.12)*1.4; }
+
+    ctx.save();
+    ctx.translate(x+jitterX, y+jitterY);
+    ctx.rotate(rot||0);
+    const bodyGrad = ctx.createLinearGradient(0,-16,0,10);
+    bodyGrad.addColorStop(0,'#ff6b5e'); bodyGrad.addColorStop(1,'#a81f1f');
+    ctx.fillStyle = bodyGrad;
+    ctx.beginPath();
+    ctx.moveTo(-8,10); ctx.quadraticCurveTo(-10,-8,0,-16); ctx.quadraticCurveTo(10,-8,8,10);
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(-4,4); ctx.lineTo(4,4); ctx.stroke();
+    ctx.strokeStyle = '#c9a35a'; ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.moveTo(0,-16); ctx.quadraticCurveTo(6,-22,2,-27); ctx.stroke();
+    const sparkA = 0.5+0.5*Math.sin(now*0.02);
+    ctx.fillStyle = 'rgba(255,200,120,'+sparkA+')';
+    ctx.beginPath(); ctx.arc(2,-27,2.4,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+  function drawSparks(){
+    ctx.save(); ctx.globalCompositeOperation = 'lighter';
+    for(const s of sparks){
+      const a = clamp(1-s.age/s.maxLife,0,1);
+      ctx.globalAlpha = a;
+      ctx.fillStyle = s.color;
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.size,0,Math.PI*2); ctx.fill();
+    }
+    ctx.restore(); ctx.globalAlpha=1;
+  }
+  function drawFlyingRocket(now){
+    if(!flight || !flight.pos) return;
+    const pos = flight.pos;
+    ctx.save(); ctx.globalCompositeOperation='lighter';
+    const r = 11+speedFactor*4;
+    const g = ctx.createRadialGradient(pos.x,pos.y,0,pos.x,pos.y,r);
+    g.addColorStop(0,'rgba(255,225,175,0.95)'); g.addColorStop(1,'rgba(255,120,70,0)');
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(pos.x,pos.y,r,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+    drawRocketAt(pos.x, pos.y, now, pos.rot);
+  }
+  function petalPath(size){
+    ctx.beginPath();
+    ctx.moveTo(0,0);
+    ctx.bezierCurveTo(size*0.55,-size*0.25, size*0.55,-size*0.9, 0,-size*1.35);
+    ctx.bezierCurveTo(-size*0.55,-size*0.9, -size*0.55,-size*0.25, 0,0);
+    ctx.closePath();
+  }
+  function drawPetals(now){
+    for(const p of petals){
+      if(p.fallen) continue;
+      const pos = petalPos(p, now);
+      ctx.save();
+      ctx.translate(pos.x,pos.y);
+      ctx.rotate(pos.angle+Math.PI/2);
+      const scale = (phase==='bloom') ? pos.eased : 1;
+      ctx.scale(scale,scale);
+      ctx.shadowColor = p.color; ctx.shadowBlur = 14;
+      const g = ctx.createLinearGradient(0,0,0,-p.size*1.35);
+      g.addColorStop(0, p.color); g.addColorStop(1, '#fff2d8');
+      ctx.fillStyle = g;
+      petalPath(p.size);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+  function drawSparkles(now){
+    ctx.save(); ctx.globalCompositeOperation='lighter';
+    for(const s of sparkles){
+      const groupRot = (phase==='bloom') ? 0 : (now-ringStart>0 ? (now-ringStart)*0.00003 : 0);
+      const angle = s.angle+groupRot;
+      const x = center.x+Math.cos(angle)*s.dist;
+      const y = center.y+Math.sin(angle)*s.dist;
+      const a = 0.25+0.6*Math.abs(Math.sin(now*0.0025*s.speed+s.phase));
+      ctx.globalAlpha = a; ctx.fillStyle = '#fff6df';
+      ctx.beginPath(); ctx.arc(x,y,s.size,0,Math.PI*2); ctx.fill();
+    }
+    ctx.restore(); ctx.globalAlpha=1;
+  }
+  function drawStreamers(){
+    ctx.save(); ctx.globalCompositeOperation='lighter';
+    for(const s of streamers){
+      const a = clamp(1-s.life/s.maxLife,0,1);
+      for(let i=0;i<s.trail.length-1;i++){
+        const t0=s.trail[i], t1=s.trail[i+1];
+        const ta = a*(i/s.trail.length);
+        ctx.strokeStyle = s.color; ctx.globalAlpha = ta*0.7; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(t0.x,t0.y); ctx.lineTo(t1.x,t1.y); ctx.stroke();
+      }
+      ctx.globalAlpha = a; ctx.fillStyle = '#fff2d8';
+      ctx.beginPath(); ctx.arc(s.x,s.y,1.8,0,Math.PI*2); ctx.fill();
+    }
+    ctx.restore(); ctx.globalAlpha=1;
+  }
+  function drawCenterGlow(now, alpha){
+    const r = 66+9*Math.sin(now*0.002);
+    const g = ctx.createRadialGradient(center.x,center.y,0,center.x,center.y,r);
+    g.addColorStop(0,'rgba(255,230,190,'+(0.5*alpha)+')');
+    g.addColorStop(1,'rgba(255,230,190,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(center.x,center.y,r,0,Math.PI*2); ctx.fill();
+  }
+  function drawFallers(){
+    for(const f of fallers){
+      ctx.save(); ctx.globalAlpha = clamp(f.alpha,0,1); ctx.globalCompositeOperation='lighter';
+      ctx.fillStyle = f.color;
+      ctx.beginPath(); ctx.arc(f.x,f.y,f.size*0.5,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+    }
+  }
+  function drawStarShape(x,y,r,rot){
+    ctx.save(); ctx.translate(x,y); ctx.rotate(rot||0);
+    ctx.beginPath();
+    for(let i=0;i<4;i++){
+      const a = i*Math.PI/2;
+      ctx.moveTo(0,0);
+      ctx.quadraticCurveTo(Math.cos(a+0.3)*r*0.25, Math.sin(a+0.3)*r*0.25, Math.cos(a)*r, Math.sin(a)*r);
+      ctx.quadraticCurveTo(Math.cos(a-0.3)*r*0.25, Math.sin(a-0.3)*r*0.25, 0,0);
+    }
+    ctx.closePath(); ctx.fill(); ctx.restore();
+  }
+  function drawBurst(now){
+    ctx.save(); ctx.globalCompositeOperation='lighter';
+    for(const b of burst){
+      const a = clamp(1-b.life/b.maxLife,0,1);
+      ctx.globalAlpha = a+1; ctx.fillStyle = b.color;
+      if(b.star){
+        drawStarShape(b.x,b.y,b.size*2.2, now*0.001);
+      } else {
+        ctx.beginPath(); ctx.arc(b.x,b.y,b.size,0,Math.PI*2); ctx.fill();
+      }
+    }
+    ctx.restore(); ctx.globalAlpha=1;
+  }
+  function drawRing(now){
+    const growT = clamp((now-ringStart)/650,0,1);
+    const R = 34*easeOutBack(growT);
+    if(R<=0.5) return;
+    const rot = (now-ringStart)*0.0009;
+
+    ctx.save();
+    const glow = ctx.createRadialGradient(center.x,center.y,0,center.x,center.y,R+22);
+    glow.addColorStop(0,'rgba(255,225,160,0.4)'); glow.addColorStop(1,'rgba(255,225,160,0)');
+    ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(center.x,center.y,R+22,0,Math.PI*2); ctx.fill();
+
+    // metallic base band
+    ctx.strokeStyle = '#8a6a2c'; ctx.lineWidth = 9;
+    ctx.beginPath(); ctx.ellipse(center.x,center.y+8,R,R*0.7,0,0,Math.PI*2); ctx.stroke();
+
+    const ringGrad = ctx.createLinearGradient(center.x-R,center.y-R*0.42+8,center.x+R,center.y+R*0.42+8);
+    ringGrad.addColorStop(0,'#fff3c4'); ringGrad.addColorStop(0.35,'#d9b673'); ringGrad.addColorStop(0.5,'#fff8e0'); ringGrad.addColorStop(0.7,'#c99a4c'); ringGrad.addColorStop(1,'#fff3c4');
+    ctx.strokeStyle = ringGrad; ctx.lineWidth = 6.5;
+    ctx.beginPath(); ctx.ellipse(center.x,center.y+8,R,R*0.7,0,0,Math.PI*2); ctx.stroke();
+
+    // sweeping specular highlight
+    ctx.save(); ctx.globalCompositeOperation='lighter';
+    const ang = rot*4;
+    const hx = center.x+Math.cos(ang)*R, hy = center.y+8+Math.sin(ang)*R*0.42;
+    const hg = ctx.createRadialGradient(hx,hy,0,hx,hy,6);
+    hg.addColorStop(0,'rgba(255,255,255,0.95)'); hg.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle = hg; ctx.beginPath(); ctx.arc(hx,hy,6,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+// diamond gem
+const gy = center.y - R*0.7 + 8;
+
+ctx.save();
+
+ctx.translate(center.x, gy);
+ctx.rotate(Math.sin(rot)*0.06);
+
+const gemGrad = ctx.createLinearGradient(0, -18, 0, 18);
+gemGrad.addColorStop(0, '#eaf7ff');
+gemGrad.addColorStop(0.5, '#7fd8ff');
+gemGrad.addColorStop(1, '#1c5c99');
+
+ctx.fillStyle = gemGrad;
+
+ctx.beginPath();
+ctx.moveTo(0, -20);
+ctx.lineTo(15, 0);
+ctx.lineTo(0, 20);
+ctx.lineTo(-15, 0);
+ctx.closePath();
+
+ctx.shadowColor = '#8fe0ff';
+ctx.shadowBlur = 20;
+
+ctx.fill();
+
+ctx.restore();
+
+    // sparkle flares near gem
+    const flareA = Math.max(0, Math.sin(now*0.006));
+    if(flareA>0.75){
+      ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.fillStyle='rgba(255,255,255,0.9)';
+      drawStarShape(center.x+rand(-10,10), gy+rand(-8,8), 5, now*0.002);
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+  function drawAmbient(){
+    for(const a of ambient){
+      ctx.save(); ctx.globalAlpha = clamp(a.alpha,0,1);
+      ctx.fillStyle = a.hue; ctx.font = a.size+'px sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(a.glyph, a.x, a.y);
+      ctx.restore();
+    }
+  }
+
+  function draw(now){
+    ctx.clearRect(0,0,W,H);
+    ctx.save();
+    if(phase==='ignite'){
+      const s = 1.2;
+      ctx.translate(rand(-s,s)*0.4, rand(-s,s)*0.4);
+    }
+    drawSky();
+    drawStars(now);
+    drawHill();
+
+    if(phase==='idle') drawRocketIdle(now);
+    if(phase==='ignite'){ drawRocketIdle(now); drawSparks(); }
+    if(phase==='flying'){ drawSparks(); drawFlyingRocket(now); }
+
+    if(phase==='bloom'||phase==='ring'||phase==='letter'||phase==='closing'){
+      ctx.save(); ctx.globalAlpha *= flowerAlpha;
+      const cgAlpha = phase==='bloom' ? clamp((now-bloomStart)/700,0,1) : 1;
+      drawCenterGlow(now, cgAlpha);
+      drawPetals(now);
+      drawSparkles(now);
+      drawStreamers();
+      ctx.restore();
+    }
+    if(phase==='ring'||phase==='letter'||phase==='closing'){
+      ctx.save(); ctx.globalAlpha *= ringAlpha;
+      drawRing(now);
+      ctx.restore();
+    }
+    drawFallers();
+   if(phase==='closing' || phase==='thanks'){
+  drawBurst(now);
+}
+
+    ctx.restore();
+  }
+
+  /* ============ Loop ============ */
+  function loop(now){
+    const dt = Math.min(now-last, 48);
+    last = now;
+    update(now, dt);
+    draw(now);
+    requestAnimationFrame(loop);
+  }
+
+  resize();
+  requestAnimationFrame(t => { last = t; requestAnimationFrame(loop); });
+})();
+</script>
+</body>
+</html>
