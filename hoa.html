@@ -293,7 +293,7 @@ function playRocketSound(){
   if(!soundEl) return;
 
   try{
-    soundEl.currentTime = 73;
+
     soundEl.volume = 0.7; // 🔊 chỉnh âm lượng ở đây
     const p = soundEl.play();
     if(p && p.catch) p.catch(()=>{});
